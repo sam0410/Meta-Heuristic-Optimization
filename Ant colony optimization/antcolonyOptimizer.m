@@ -4,7 +4,6 @@ population=10;
 iterations=500;
 numVariables=5;
 SampleSize=40;
-VarSize=[1 numVariables];
 VarMin=-10;
 VarMax=10;
 q=0.5;              % Intensification Factor (Selection Pressure)
@@ -16,7 +15,7 @@ antColony= repmat(ant,population,1);
 
 %% Initialisation
 for i= 1: population
-antColony(i).Position= unifrnd(VarMin,VarMax,VarSize);
+antColony(i).Position= unifrnd(VarMin,VarMax,1,numVariables);
 antColony(i).Cost=CostFunction(antColony(i).Position);
 end
 
@@ -34,9 +33,13 @@ for i= 1:iterations
  sigma= zeros(population,numVariables); %standard deviation
  
  for j=1:population
-    stdDev=zeros(numVariables,1);
+    stdDev=0;    
+    posDif=antColony(j).Position;
+    posDif=reshape(posDif,[1 5]);
     for k=1:population
-        stdDev=stdDev+abs(antColony(j).Position-antColony(k).Position);        
+        tempPos=antColony(k).Position; 
+        tempPos=reshape(tempPos,[1 5]);
+        stdDev=stdDev+(abs(posDif-tempPos));        
     end
     sigma(j,:)=stdDev*zeta/(population-1);
  end
@@ -60,7 +63,7 @@ antColony=antColony(SortedPop);
 antColony=antColony(1:population);
 BestSolution= antColony(1);
 BestCostEveryIteration(i)=BestSolution.Cost;
-
+disp(['Iteration ' num2str(i) ': Best Cost = ' num2str(BestCostEveryIteration(i))]);
 end
 
 
